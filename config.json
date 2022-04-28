@@ -1,0 +1,5 @@
+{
+  "name": "gmedit-online",
+  "scripts": ["main.js"],
+  "styleschhets": ["global.css"]
+}
