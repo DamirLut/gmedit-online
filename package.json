@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "scripts": {
+    "start:server": "nodemon main.js --server",
+    "start:master": "nodemon master-server"
+  },
+  "dependencies": {
+    "ws": "^8.5.0"
+  }
+}
