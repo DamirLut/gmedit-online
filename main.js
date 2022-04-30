@@ -1,9 +1,10 @@
 // @ts-nocheck
 
-const isNodejs = typeof process !== 'undefined';
-console.log('Plugin load from', isNodejs ? 'NodeJS' : 'Browser');
+import isNodeJS from './tools/isNodeJs.js';
+console.log('Plugin load from', isNodeJS ? 'NodeJS' : 'Browser');
 
 import Plugin from './gmedit/index.js';
+import readJson from './tools/readJson.js';
 
 function LoadPlugin() {
   GMEdit.register('gmedit-online', {
@@ -15,14 +16,21 @@ function LoadPlugin() {
 
 var args = [];
 
-if (isNodejs) {
+if (isNodeJS) {
   process.argv.splice(0, 2);
   args = process.argv;
 }
 if (args.includes('--server')) {
   if (!args.includes('--project')) throw console.error('--project arg undefined');
   const path = args[args.indexOf('--project') + 1];
-  import('./local-server/index.js').then(({ default: server }) => server(path));
+
+  const startServer = async () => {
+    const { default: server } = await import('./local-server/index.js');
+    const settings = readJson('./settings.json');
+    server(path, settings);
+  };
+
+  startServer();
 } else {
   LoadPlugin();
 }

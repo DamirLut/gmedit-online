@@ -1,52 +1,50 @@
 ///@ts-nocheck
 
-const isNodejs = typeof process !== 'undefined';
+import fs from '../tools/fsWrapper.js';
+import readJson from '../tools/readJson.js';
+import isNodeJS from '../tools/isNodeJs.js';
+import { AddMenuButton, SetEnableMenuButton } from './api.js';
 
 function init(gmeditState) {
   const MenuListItems = [
-    new Electron_MenuItem({
+    {
       id: 'gmeditonline-sep',
       type: 'separator',
-    }),
-
-    new Electron_MenuItem({
+    },
+    {
       id: 'gmeditonline-join-server',
       label: 'Join Live Session',
-      enabled: false,
+      enabled: true,
       click: (event) => {
         console.log(event);
       },
-    }),
+    },
   ];
-  if (isNodejs) {
-    MenuListItems.push(
-      new Electron_MenuItem({
-        id: 'gmeditonline-start-server',
-        label: 'Start Live Session',
-        enabled: false,
-        click: (event) => {
-          const server = require(gmeditState.dir + '/local-server');
-          server($gmedit['gml.Project'].current.dir);
-          for (let item of MenuListItems) {
-            item.enabled = false;
-          }
-        },
-      }),
-    );
+  if (isNodeJS) {
+    MenuListItems.push({
+      id: 'gmeditonline-start-server',
+      label: 'Start Live Session',
+      enabled: false,
+      click: async (event) => {
+        const { default: server } = await import(gmeditState.dir + '/local-server/index.js');
+        const settings = readJson(gmeditState.dir + '/settings.json');
+        server($gmedit['gml.Project'].current.dir, settings);
+        for (let item of MenuListItems) {
+          SetEnableMenuButton(item.id, false);
+        }
+      },
+    });
   }
-
-  let MainMenu = $gmedit['ui.MainMenu'].menu;
-  for (let [index, mainMenuItem] of MainMenu.items.entries()) {
-    if (mainMenuItem.id != 'close-project') continue;
-    for (let newItem of MenuListItems) {
-      MainMenu.insert(++index, newItem);
-    }
-    break;
-  }
+  AddMenuButton(MenuListItems);
 
   GMEdit.on('projectClose', () => {
     for (let item of MenuListItems) {
-      item.enabled = false;
+      SetEnableMenuButton(item.id, false);
+    }
+  });
+  GMEdit.on('projectOpen', () => {
+    for (let item of MenuListItems) {
+      SetEnableMenuButton(item.id, true);
     }
   });
 
