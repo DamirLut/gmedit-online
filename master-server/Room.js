@@ -8,16 +8,19 @@ export class Room extends EventEmitter {
 
   constructor(admin) {
     super();
-    this.join(admin);
+
     Room.Rooms[this.id] = this;
     admin.room = this;
     console.log('room created', this.id);
+    console.log('Rooms:', Object.keys(Room.Rooms).length);
+    this.join(admin);
   }
 
-  leave(id) {
-    const client = this.clients.indexOf((client) => client.id == id);
-    if (client) {
-      this.clients.splice(client, 1);
+  leave(client) {
+    const find = this.clients.indexOf((_client) => _client.id == client.id);
+    if (find) {
+      this.clients.splice(find, 1);
+      console.log('Room size:', this.clients.length);
     }
     if (this.clients.length == 0) {
       delete Room.Rooms[this.id];
@@ -28,5 +31,6 @@ export class Room extends EventEmitter {
     this.clients.push(client);
     console.log(client.id, 'joined to', this.id);
     client.room = this;
+    console.log('Room size:', this.clients.length);
   }
 }

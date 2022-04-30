@@ -5,11 +5,11 @@ import Server from './Server.js';
 
 export default function init(path, settings) {
   const dir = fs().readdirSync(path);
-  dir.forEach((file) => {
+  for (let file of dir) {
     if (file.endsWith('.yyp')) {
       const project = readYY(path + '/' + file);
       console.log('Start local server!');
-      new Server(project, settings);
+      return new Server(project, settings);
     }
-  });
+  }
 }

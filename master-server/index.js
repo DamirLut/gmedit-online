@@ -5,6 +5,10 @@ import { Room } from './Room.js';
 
 console.log('Start master-server!');
 
+function heartbeat() {
+  this.isAlive = true;
+}
+
 const server = new WebSocketServer({ port: 12345 });
 
 function socket_send(socket, event, data) {
@@ -17,7 +21,15 @@ server.on('connection', (socket, req) => {
     id: 'user.' + randomid(),
     room: null,
   };
+  socket.isAlive = true;
+  socket.on('pong', heartbeat);
   console.log('conntected', client.id);
+  const roomId = req.url.slice(1, req.url.length);
+  if (roomId) {
+    if (roomId in Room.Rooms) {
+      Room.Rooms[roomId].join(client);
+    }
+  }
   socket.on('message', (message) => {
     const { event, data } = JSON.parse(message);
     switch (event) {
@@ -28,18 +40,32 @@ server.on('connection', (socket, req) => {
         });
         break;
       }
-      case 'join-room': {
-        const id = data.id;
-        if (id in Room.Rooms) {
-          Room.Rooms[id].join(client);
+      case 'room-message': {
+        if (client.room == null) return;
+        if (client.room.id in Room.Rooms) {
+          Room.Rooms[client.room.id].clients.forEach(({ socket }) => {
+            socket.send(
+              JSON.stringify({
+                ...data,
+                user: client.id,
+              }),
+            );
+          });
         }
-        break;
       }
     }
   });
 
   socket.on('close', () => {
     console.log('disconnected', client.id);
-    client.room.leave(client);
+    if (client.room) client.room.leave(client);
   });
 });
+
+setInterval(() => {
+  server.clients.forEach((socket) => {
+    if (!socket.isAlive) return socket.terminate();
+    socket.isAlive = false;
+    socket.ping();
+  });
+}, 30000);

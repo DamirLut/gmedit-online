@@ -36,4 +36,8 @@ export default class Server {
       this.PromiseList[event] = { resolve, reject };
     });
   }
+
+  close() {
+    this.socket.close();
+  }
 }

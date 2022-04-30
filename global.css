@@ -1,0 +1,22 @@
+.promtRoom {
+  position: absolute;
+  top: 30%;
+  z-index: 10000;
+  padding: 2em 5em;
+  background-color: #eee;
+  border-radius: 5px;
+
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+.promtRoom > div {
+  display: inline-flex;
+  gap: 1em;
+}
+
+.promtRoom > div > button {
+  width: 40%;
+}
+.promtRoom > div > input {
+  width: 100%;
+}

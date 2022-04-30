@@ -24,4 +24,8 @@ export default class WsWrapper extends EventEmitter {
   send(data) {
     this.socket.send(data);
   }
+  close() {
+    console.log('Close websocket');
+    this.socket.close();
+  }
 }

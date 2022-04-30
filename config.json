@@ -1,6 +1,6 @@
 {
   "name": "gmedit-online",
   "scripts": ["main.js"],
-  "styleschhets": ["global.css"],
+  "stylesheets": ["global.css"],
   "module": true
 }
