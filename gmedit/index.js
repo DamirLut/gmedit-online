@@ -5,7 +5,7 @@ import readJson from '../tools/readJson.js';
 import isNodeJS from '../tools/isNodeJs.js';
 import { AddMenuButton, SetEnableMenuButton } from './api.js';
 import Client from './Client.js';
-
+const masterServer = 'ws://192.168.0.2:12345';
 function init(gmeditState) {
   const MenuListItems = [
     {
@@ -28,7 +28,6 @@ function init(gmeditState) {
         </div>
         `;
         div.children[1].children[1].onclick = () => {
-          const masterServer = 'ws://192.168.0.2:12345';
           const roomId = div.children[1].children[0].value;
           console.log(roomId);
           window.client = new Client(masterServer + '/' + roomId);
@@ -69,7 +68,9 @@ function init(gmeditState) {
 
   console.log('GMEdit-online inited');
 
-  console.log($gmedit);
+  if (window.location.hash.startsWith('#room.')) {
+    window.client = new Client(masterServer + '/' + window.location.hash.replace('#', ''));
+  }
 }
 
 export default init;

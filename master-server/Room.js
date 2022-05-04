@@ -25,12 +25,33 @@ export class Room extends EventEmitter {
     if (this.clients.length == 0) {
       delete Room.Rooms[this.id];
       console.log('room destroyed', this.id);
+      return;
     }
+    this.sendRoom('chat', {
+      message: `${client.id} lefted`,
+    });
   }
   join(client) {
     this.clients.push(client);
     console.log(client.id, 'joined to', this.id);
     client.room = this;
     console.log('Room size:', this.clients.length);
+    this.sendRoom('chat', {
+      message: `${client.id} joined`,
+    });
+  }
+
+  sendClient(client, event, data, _sender = { id: this.id }) {
+    client.socket.send(
+      JSON.stringify({
+        event,
+        data,
+        user: _sender.id,
+      }),
+    );
+  }
+
+  sendRoom(event, data) {
+    this.clients.forEach((client) => this.sendClient(client, event, data));
   }
 }

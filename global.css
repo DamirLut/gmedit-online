@@ -20,3 +20,14 @@
 .promtRoom > div > input {
   width: 100%;
 }
+
+.chat-container {
+  position: relative;
+}
+
+.chat-container > input {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  height: 3em;
+}

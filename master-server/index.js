@@ -43,14 +43,7 @@ server.on('connection', (socket, req) => {
       case 'room-message': {
         if (client.room == null) return;
         if (client.room.id in Room.Rooms) {
-          Room.Rooms[client.room.id].clients.forEach(({ socket }) => {
-            socket.send(
-              JSON.stringify({
-                ...data,
-                user: client.id,
-              }),
-            );
-          });
+          Room.Rooms[client.room.id].sendRoom(data.event, data.data, client);
         }
       }
     }
